@@ -1,56 +1,71 @@
-import {useState} from 'react'
+// Write your code here
+import { Component } from 'react'
 
 import './index.css'
 
-const TodoItem = props => {
-  const {todoDetails, deleteTodo, saveTodo} = props
-  const {id, title} = todoDetails
-
-  const [isSaved, setIsSaved] = useState(true)
-  const [newTitle, setNewTitle] = useState(title)
-
-  const onDeleteTodo = () => {
-    deleteTodo(id)
+class TodoItem extends Component {
+  state = {
+    editing: false,
+    updatedTitle: '',
   }
 
-  const onSaveTodo = () => {
-    setIsSaved(true)
-    saveTodo({id, title: newTitle})
+  handleEdit = () => {
+    const { todoDetails } = this.props
+    this.setState({ editing: true, updatedTitle: todoDetails.title })
   }
 
-  const onEditClick = () => setIsSaved(false)
+  handleSave = () => {
+    // const {todoDetails} = this.props
+    // const {updatedTitle} = this.state
+    this.setState({ editing: false })
+    // Call a function to save updated title (not implemented in this code)
+  }
 
-  const onChangeHandler = event => setNewTitle(event.target.value)
+  handleChange = e => {
+    this.setState({ updatedTitle: e.target.value })
+  }
 
-  return (
-    <li className="todo-item">
-      {isSaved ? (
-        <p className="title">{title}</p>
-      ) : (
-        <input className="title" value={newTitle} onChange={onChangeHandler} />
-      )}
-      {isSaved ? (
-        <button
-          type="button"
-          className="delete-btn edit-btn"
-          onClick={onEditClick}
-        >
-          Edit
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="delete-btn save-btn"
-          onClick={onSaveTodo}
-        >
-          Save
-        </button>
-      )}
-      <button type="button" className="delete-btn" onClick={onDeleteTodo}>
-        Delete
-      </button>
-    </li>
-  )
+  render() {
+    const { todoDetails, deleteTodo, toggleComplete } = this.props
+    const { editing, updatedTitle } = this.state
+    return (
+      <li
+        className={todoDetails.completed ? 'todo-item completed' : 'todo-item'}
+      >
+        {editing ? (
+          <>
+            <input
+              type="text"
+              value={updatedTitle}
+              onChange={this.handleChange}
+            />
+            <button onClick={this.handleSave} type="button">
+              Save
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="text-container">
+              <input
+                type="checkbox"
+                checked={todoDetails.completed}
+                onChange={() => toggleComplete(todoDetails.id)}
+              />
+              <p className="title">{todoDetails.title}</p>
+            </div>
+            <div>
+              <button onClick={this.handleEdit} type="button">
+                Edit
+              </button>
+              <button onClick={() => deleteTodo(todoDetails.id)} type="button">
+                Delete
+              </button>
+            </div>
+          </>
+        )}
+      </li>
+    )
+  }
 }
 
 export default TodoItem
